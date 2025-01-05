@@ -1,0 +1,5 @@
+TELEGRAM_BOT_TOKEN            = ""
+CLOUD_ID                      = ""
+FOLDER_ID                     = ""
+SERVERLESS_FUNCTION_NAME      = ""
+SERVICE_ACCOUNT_KEY_FILE_PATH = ""
