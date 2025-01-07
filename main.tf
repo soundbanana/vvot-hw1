@@ -46,7 +46,7 @@ variable "SERVICE_ACCOUNT_ID" {
 
 variable "SERVERLESS_FUNCTION_NAME" {
   type        = string
-  description = "Name for the serverless function in Yandex Cloud."
+  description = "Name for the serverless function in Yandex Cloud"
 }
 
 variable "TELEGRAM_BOT_TOKEN" {
@@ -76,8 +76,8 @@ resource "yandex_function" "func" {
   user_hash          = archive_file.bot_code.output_sha256
 
   environment = {
-    "TELEGRAM_BOT_TOKEN" = var.TELEGRAM_BOT_TOKEN
-    "FOLDER_ID" = var.FOLDER_ID
+    "TELEGRAM_BOT_TOKEN"      = var.TELEGRAM_BOT_TOKEN
+    "FOLDER_ID"               = var.FOLDER_ID
     "SERVICE_ACCOUNT_API_KEY" = yandex_iam_service_account_api_key.sa_api_key.secret_key
   }
 
