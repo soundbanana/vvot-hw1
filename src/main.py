@@ -1,11 +1,9 @@
 import os
 import json
 import requests
+from constants import TELEGRAM_API_URL
 
 from messages_handler import handle_text_message
-
-# Telegram Bot Token
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # List of supported commands
 SUPPORTED_COMMANDS = ["/start", "/help"]
@@ -26,14 +24,14 @@ MESSAGES = {
 # Function to send messages
 def send_message(chat_id, text):
     print(text)
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    url = f"{TELEGRAM_API_URL}/sendMessage"
     data = {'chat_id': chat_id, 'text': text}
     r = requests.post(url, data=data)
     return r
 
 # Function to delete messages
 def delete_message(chat_id, message_id):
-    url = f"https://api.telegram.org/bot{TOKEN}/deleteMessage"
+    url = f"{TELEGRAM_API_URL}/deleteMessage"
     data = {'chat_id': chat_id, 'message_id': message_id}
     r = requests.post(url, data=data)
     return r

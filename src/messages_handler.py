@@ -1,10 +1,6 @@
 import requests
 import os
-
-FOLDER_ID = os.getenv("FOLDER_ID")
-SERVICE_ACCOUNT_API_KEY = os.getenv("SERVICE_ACCOUNT_API_KEY")
-
-YANDEX_GPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+from constants import FOLDER_ID, SERVICE_ACCOUNT_API_KEY, YANDEX_GPT_API_URL
 
 def handle_text_message(text):
     answer = get_answer_from_gpt(text)
