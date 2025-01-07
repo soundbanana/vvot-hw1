@@ -1,25 +1,12 @@
 import os
 import json
 import requests
-from constants import TELEGRAM_API_URL
+from constants import TELEGRAM_API_URL, MESSAGES
 
-from messages_handler import handle_text_message
+from messages_handler import handle_text_message, handle_photo_message
 
 # List of supported commands
 SUPPORTED_COMMANDS = ["/start", "/help"]
-
-# Text messages
-MESSAGES = {
-    "start_help": (
-        "Я помогу подготовить ответ на экзаменационный вопрос по дисциплине \"Операционные системы\".\n"
-        "Пришлите мне фотографию с вопросом или наберите его текстом."
-    ),
-    "unknown_command": "Извините, я не понимаю эту команду. Попробуйте /start или /help.",
-    "multiple_photos_error": "Я могу обработать только одну фотографию.",
-    "incorrect_input": "Извините, я не понимаю эту команду. Попробуйте /start или /help.",
-    "no_message": "No message to process.",
-    "error": "Произошла ошибка при обработке сообщения.",
-}
 
 # Function to send messages
 def send_message(chat_id, text):
@@ -38,19 +25,16 @@ def delete_message(chat_id, message_id):
 
 # Handle message content (commands, photos, and regular text)
 def handle_message(message, chat_id):
-    if "photo" in message:  # Check if the message contains a photo
-        # If multiple photos
-        if "media_group_id" in message:
-            send_message(chat_id, MESSAGES["multiple_photos_error"])
-            return
-        send_message(chat_id, "Я получил фото")
+    if photo := message.get("photo"):  # Check if the message contains a photo
         print("Photo metadata:", message["photo"])
-    elif "text" in message:  # Check if the message contains text
+        response = handle_photo_message(photo, message)
+        send_message(chat_id, response)
+    elif text := message.get("text"):  # Check if the message contains text
         # Check for commands in the text
         entities = message.get("entities", [])
         command_entity = next((e for e in entities if e.get("type") == "bot_command"), None)
         if command_entity:
-            command = message["text"][command_entity["offset"]:command_entity["offset"] + command_entity["length"]]
+            command = text[command_entity["offset"]:command_entity["offset"] + command_entity["length"]]
             if command in SUPPORTED_COMMANDS:
                 send_message(chat_id, MESSAGES["start_help"])
             else:
@@ -61,7 +45,7 @@ def handle_message(message, chat_id):
             processing_message_id = processing_message.json().get("result", {}).get("message_id")
 
             # Process the user message
-            response = handle_text_message(message["text"])
+            response = handle_text_message(text)
 
             # Delete the "Обрабатываю запрос..." message
             if processing_message_id:

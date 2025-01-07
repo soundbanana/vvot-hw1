@@ -9,4 +9,22 @@ SERVICE_ACCOUNT_API_KEY = os.getenv("SERVICE_ACCOUNT_API_KEY")
 
 # API URLs
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
+TELEGRAM_FILE_URL = f"https://api.telegram.org/file/bot{TELEGRAM_BOT_TOKEN}"
 YANDEX_GPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+YANDEX_OCR_API_URL = "https://ocr.api.cloud.yandex.net/ocr/v1/recognizeText"
+
+# Text messages
+MESSAGES = {
+    "start_help": (
+        "Я помогу подготовить ответ на экзаменационный вопрос по дисциплине \"Операционные системы\".\n"
+        "Пришлите мне фотографию с вопросом или наберите его текстом."
+    ),
+    "unknown_command": "Извините, я не понимаю эту команду. Попробуйте /start или /help.",
+    "multiple_photos_error": "Я могу обработать только одну фотографию.",
+    "incorrect_input": "Извините, я не понимаю эту команду. Попробуйте /start или /help.",
+    "no_message": "No message to process.",
+    "photo_processing_error": "Не удалось обработать изображение.",
+    "photo_download_error": "Ошибка загрузки изображения.", 
+    "ocr_recognition_error": "Не удалось распознать текст на изображении.",
+    "error": "Произошла ошибка при обработке сообщения.",
+}
