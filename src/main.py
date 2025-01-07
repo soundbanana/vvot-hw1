@@ -31,6 +31,13 @@ def send_message(chat_id, text):
     r = requests.post(url, data=data)
     return r
 
+# Function to delete messages
+def delete_message(chat_id, message_id):
+    url = f"https://api.telegram.org/bot{TOKEN}/deleteMessage"
+    data = {'chat_id': chat_id, 'message_id': message_id}
+    r = requests.post(url, data=data)
+    return r
+
 # Handle message content (commands, photos, and regular text)
 def handle_message(message, chat_id):
     if "photo" in message:  # Check if the message contains a photo
@@ -51,8 +58,18 @@ def handle_message(message, chat_id):
             else:
                 send_message(chat_id, MESSAGES["unknown_command"])
         else:
-            send_message(chat_id, "Обрабатываю запрос...")
+            # Send "Обрабатываю запрос..." message and save the response
+            processing_message = send_message(chat_id, "Обрабатываю запрос...")
+            processing_message_id = processing_message.json().get("result", {}).get("message_id")
+
+            # Process the user message
             response = handle_text_message(message["text"])
+
+            # Delete the "Обрабатываю запрос..." message
+            if processing_message_id:
+                delete_message(chat_id, processing_message_id)
+
+            # Send the actual response to the user
             send_message(chat_id, response)
     else:
         send_message(chat_id, MESSAGES["incorrect_input"])
