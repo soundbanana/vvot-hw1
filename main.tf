@@ -23,7 +23,7 @@ provider "telegram" {
   bot_token = var.TELEGRAM_BOT_TOKEN
 }
 
-# Variables for configuration
+# Variables
 variable "CLOUD_ID" {
   type        = string
   description = "Yandex Cloud ID."
@@ -32,12 +32,16 @@ variable "CLOUD_ID" {
 variable "FOLDER_ID" {
   type        = string
   description = "Yandex Cloud Folder ID."
-
 }
 
 variable "SERVICE_ACCOUNT_KEY_FILE_PATH" {
   type        = string
-  description = "Path to the Yandex service account key file."
+  description = "Path to the key for service account with admin role."
+}
+
+variable "SERVICE_ACCOUNT_ID" {
+  type        = string
+  description = "Admin Service Account ID"
 }
 
 variable "SERVERLESS_FUNCTION_NAME" {
@@ -57,16 +61,24 @@ resource "archive_file" "bot_code" {
   output_path = "telegram.zip"
 }
 
+# Service Account
+resource "yandex_iam_service_account_api_key" "sa_api_key" {
+  service_account_id = var.SERVICE_ACCOUNT_ID
+}
+
 # Yandex Cloud Function configuration
 resource "yandex_function" "func" {
-  name       = var.SERVERLESS_FUNCTION_NAME
-  runtime    = "python312"
-  entrypoint = "main.handler"
-  memory     = 128
-  user_hash  = archive_file.bot_code.output_sha256
+  name               = var.SERVERLESS_FUNCTION_NAME
+  runtime            = "python312"
+  entrypoint         = "main.handler"
+  memory             = 128
+  service_account_id = var.SERVICE_ACCOUNT_ID
+  user_hash          = archive_file.bot_code.output_sha256
 
   environment = {
     "TELEGRAM_BOT_TOKEN" = var.TELEGRAM_BOT_TOKEN
+    "FOLDER_ID" = var.FOLDER_ID
+    "SERVICE_ACCOUNT_API_KEY" = yandex_iam_service_account_api_key.sa_api_key.secret_key
   }
 
   content {
@@ -79,7 +91,7 @@ resource "telegram_bot_webhook" "set_webhook" {
   url = "https://api.telegram.org/bot${var.TELEGRAM_BOT_TOKEN}/setWebhook?url=https://functions.yandexcloud.net/${yandex_function.func.id}"
 }
 
-# Outputs for important resources
+# Outputs
 output "function_url" {
   description = "The public URL of the deployed Yandex Function."
   value       = "https://functions.yandexcloud.net/${yandex_function.func.id}"
