@@ -49,6 +49,16 @@ variable "SERVERLESS_FUNCTION_NAME" {
   description = "Name for the serverless function in Yandex Cloud"
 }
 
+variable "BUCKET_NAME" {
+  type        = string
+  description = "Name for the Bucket in Yandex Cloud"
+}
+
+variable "BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY" {
+  type        = string
+  description = "Name for the Instructions file inside Bucket"
+}
+
 variable "TELEGRAM_BOT_TOKEN" {
   type        = string
   description = "Telegram Bot API Token."
@@ -58,7 +68,7 @@ variable "TELEGRAM_BOT_TOKEN" {
 resource "archive_file" "bot_code" {
   type        = "zip"
   source_dir  = "./src"
-  output_path = "telegram.zip"
+  output_path = "./archive/telegram.zip"
 }
 
 # Service Account
@@ -76,14 +86,35 @@ resource "yandex_function" "func" {
   user_hash          = archive_file.bot_code.output_sha256
 
   environment = {
-    "TELEGRAM_BOT_TOKEN"      = var.TELEGRAM_BOT_TOKEN
-    "FOLDER_ID"               = var.FOLDER_ID
-    "SERVICE_ACCOUNT_API_KEY" = yandex_iam_service_account_api_key.sa_api_key.secret_key
+    "TELEGRAM_BOT_TOKEN"                 = var.TELEGRAM_BOT_TOKEN
+    "FOLDER_ID"                          = var.FOLDER_ID
+    "SERVICE_ACCOUNT_API_KEY"            = yandex_iam_service_account_api_key.sa_api_key.secret_key
+    "BUCKET_NAME"                        = var.BUCKET_NAME
+    "BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY" = var.BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY
   }
 
   content {
     zip_filename = archive_file.bot_code.output_path
   }
+
+  mounts {
+    name = var.BUCKET_NAME
+    mode = "ro"
+    object_storage {
+      bucket = yandex_storage_bucket.instructions_bucket.bucket
+    }
+  }
+}
+
+# Object Storage
+resource "yandex_storage_bucket" "instructions_bucket" {
+  bucket = var.BUCKET_NAME
+}
+
+resource "yandex_storage_object" "gpt_instructions" {
+  bucket = yandex_storage_bucket.instructions_bucket.id
+  key    = var.BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY
+  source = "./instructions/gpt_instructions.txt"
 }
 
 # Set Telegram Bot Webhook

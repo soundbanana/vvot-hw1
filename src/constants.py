@@ -6,6 +6,8 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # Yandex Cloud Constants
 FOLDER_ID = os.getenv("FOLDER_ID")
 SERVICE_ACCOUNT_API_KEY = os.getenv("SERVICE_ACCOUNT_API_KEY")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY = os.getenv("BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY")
 
 # API URLs
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
@@ -21,9 +23,9 @@ MESSAGES = {
     ),
     "unknown_command": "Извините, я не понимаю эту команду. Попробуйте /start или /help.",
     "multiple_photos_error": "Я могу обработать только одну фотографию.",
-    "incorrect_input": "Извините, я не понимаю эту команду. Попробуйте /start или /help.",
+    "incorrect_input": "Я могу обработать только текстовое сообщение или фотографию.\nИспользуйте /help для получения подсказок.",
     "no_message": "No message to process.",
-    "photo_processing_error": "Не удалось обработать изображение.",
+    "photo_processing_error": "Я не могу обработать эту фотографию.",
     "photo_download_error": "Ошибка загрузки изображения.", 
     "ocr_recognition_error": "Не удалось распознать текст на изображении.",
     "error": "Произошла ошибка при обработке сообщения.",

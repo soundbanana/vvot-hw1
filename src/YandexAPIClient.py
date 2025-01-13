@@ -1,8 +1,9 @@
 import base64
 import logging
 import requests
-from constants import YANDEX_GPT_API_URL, YANDEX_OCR_API_URL, SERVICE_ACCOUNT_API_KEY, FOLDER_ID, MESSAGES
+from constants import YANDEX_GPT_API_URL, YANDEX_OCR_API_URL, SERVICE_ACCOUNT_API_KEY, FOLDER_ID, MESSAGES, BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY
 from utils import ProcessingError
+from helpers import get_object_from_bucket
 
 # Set up a logger
 logger = logging.getLogger()
@@ -38,7 +39,7 @@ class YandexAPIClient:
             "messages": [
                 {
                     "role": "system",
-                    "text": "Ты преподаватель по предмету Облачные технологии"
+                    "text": get_object_from_bucket(BUCKET_OBJECT_GPT_INSTRUCTIONS_KEY)
                 },
                 {
                     "role": "user",
